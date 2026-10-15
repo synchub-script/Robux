@@ -1,7 +1,6 @@
-// script.js — основная логика приложения
+// script.js — вся логика магазина
 
 const WEBHOOK_URL = 'https://discord.com/api/webhooks/1560344628866187288/5ebGdqOjskaYIRPkwlhAUNvXJy4ocbkwwX5cisLNd0ZCKRGDiR9g6wUNKHnn685b1Xje';
-
 const KASPI_PHONE = '4400430056560235';
 
 const state = {
@@ -14,7 +13,6 @@ const state = {
   receiptFile: null,
 };
 
-// ==== Элементы ====
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 
@@ -22,14 +20,12 @@ const amountDisplay = $('#amount-display');
 const amountSlider  = $('#amount-slider');
 const totalEl       = $('#total');
 const robuxTotalEl  = $('#robux-total');
-const balanceEl     = $('#balance');
 
 const nextBtn  = $('#next-btn');
 const backBtn  = $('#back-btn');
 const navBar   = $('#nav-buttons');
 const bottomBar = $('#bottom-bar');
 
-// ==== Формат ====
 function formatMoney(n) {
   return n.toLocaleString('ru-RU') + ' ₸';
 }
@@ -46,7 +42,7 @@ function generateOrderNumber() {
   return 'RBX-' + rnd;
 }
 
-// ==== Шаг 1: слайдер и быстрые кнопки ====
+// ==== Шаг 1: слайдер и кнопки ====
 amountSlider.addEventListener('input', (e) => {
   state.amount = Number(e.target.value);
   $$('.quick').forEach((b) => b.classList.toggle('active', Number(b.dataset.amount) === state.amount));
@@ -73,7 +69,7 @@ $$('.method').forEach((btn) => {
   });
 });
 
-// ==== Навигация по шагам ====
+// ==== Навигация ====
 function goToStep(n) {
   state.step = n;
   $$('.step-panel').forEach((p) => p.classList.toggle('hidden', Number(p.dataset.panel) !== n));
@@ -83,14 +79,12 @@ function goToStep(n) {
     d.classList.toggle('done', s < n);
   });
 
-  // Кнопки
   backBtn.disabled = n === 1;
   if (n === 1) nextBtn.textContent = 'Продолжить';
   if (n === 2) { nextBtn.textContent = 'Продолжить'; nextBtn.disabled = !state.user; }
   if (n === 3) nextBtn.textContent = 'Отправить заказ';
   if (n === 4) { navBar.classList.add('hidden'); bottomBar.classList.add('hidden'); }
 
-  // Прокрутка вверх карточки
   document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -99,7 +93,6 @@ nextBtn.addEventListener('click', async () => {
     goToStep(2);
   } else if (state.step === 2) {
     if (!state.user) return;
-    // Готовим шаг 3
     state.orderNumber = generateOrderNumber();
     $('#order-number').textContent = state.orderNumber;
     $('#kaspi-amount').textContent = formatMoney(Math.round(state.amount * state.rate));
@@ -119,6 +112,10 @@ const findBtn = $('#find-user');
 const userResult = $('#user-result');
 const userError = $('#user-error');
 const userLoading = $('#user-loading');
+const suggestionsBox = $('#suggestions');
+
+let searchToken = 0;
+let suggestTimer = null;
 
 async function searchUser() {
   const username = usernameInput.value.trim();
@@ -127,29 +124,79 @@ async function searchUser() {
     return;
   }
 
+  const token = ++searchToken;
   userResult.classList.add('hidden');
   userError.classList.add('hidden');
+  hideSuggestions();
   userLoading.classList.remove('hidden');
   state.user = null;
   nextBtn.disabled = true;
 
+  const t0 = performance.now();
+
   try {
     const user = await findRobloxUser(username);
-    const avatarUrl = await getRobloxAvatar(user.id);
+    if (token !== searchToken) return;
 
-    state.user = { ...user, avatar: avatarUrl };
+    const [details, avatarUrl, avatarFull, friendsCount] = await Promise.all([
+      getRobloxUserDetails(user.id),
+      getRobloxAvatar(user.id),
+      getRobloxAvatarFull(user.id),
+      getRobloxFriendsCount(user.id),
+    ]);
+    if (token !== searchToken) return;
 
-    $('#user-name').textContent = user.displayName || user.name;
-    $('#user-id').textContent = '@' + user.name + ' · ID: ' + user.id;
-    const img = $('#user-avatar');
-    img.src = avatarUrl || 'https://tr.rbxcdn.com/53f32d9c6d0d5b4be6e26b1e3d4d1c8f/150/150/AvatarHeadshot/Png';
+    const finalAvatar = avatarUrl || avatarFull;
+
+    state.user = {
+      ...user,
+      avatar: finalAvatar,
+      avatarFull,
+      created: details?.created || null,
+      description: details?.description || '',
+      friends: friendsCount,
+    };
+
+    renderUserCard(state.user);
+
+    const ms = Math.round(performance.now() - t0);
+    console.log('✅ Найдено за ' + ms + ' мс');
 
     userResult.classList.remove('hidden');
     nextBtn.disabled = false;
   } catch (err) {
+    if (token !== searchToken) return;
     showError(err.message || 'Ошибка при поиске пользователя');
   } finally {
-    userLoading.classList.add('hidden');
+    if (token === searchToken) userLoading.classList.add('hidden');
+  }
+}
+
+function renderUserCard(user) {
+  $('#user-name').textContent = user.displayName || user.name;
+
+  const createdStr = user.created
+    ? new Date(user.created).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' })
+    : '—';
+
+  $('#user-id').innerHTML =
+    '<span class="tag">@' + user.name + '</span>' +
+    '<span class="tag">ID: ' + user.id + '</span>' +
+    (user.friends !== null ? '<span class="tag">👥 ' + user.friends + '</span>' : '');
+
+  $('#user-created').textContent = '📅 На Roblox с ' + createdStr;
+
+  const img = $('#user-avatar');
+  img.src = user.avatar || 'https://tr.rbxcdn.com/53f32d9c6d0d5b4be6e26b1e3d4d1c8f/150/150/AvatarHeadshot/Png';
+
+  const desc = $('#user-desc');
+  if (user.description) {
+    desc.textContent = user.description.length > 120
+      ? user.description.slice(0, 120) + '…'
+      : user.description;
+    desc.classList.remove('hidden');
+  } else {
+    desc.classList.add('hidden');
   }
 }
 
@@ -158,10 +205,62 @@ function showError(msg) {
   userError.classList.remove('hidden');
 }
 
+function hideSuggestions() {
+  suggestionsBox.classList.add('hidden');
+  suggestionsBox.innerHTML = '';
+}
+
+usernameInput.addEventListener('input', () => {
+  clearTimeout(suggestTimer);
+  const val = usernameInput.value.trim();
+  if (val.length < 2) { hideSuggestions(); return; }
+
+  suggestTimer = setTimeout(async () => {
+    const list = await searchRobloxUsers(val, 5);
+    if (!list.length) { hideSuggestions(); return; }
+
+    suggestionsBox.innerHTML = list
+      .map((u) =>
+        '<div class="suggestion" data-name="' + u.name + '">' +
+          '<span class="s-avatar">' + u.name[0].toUpperCase() + '</span>' +
+          '<div class="s-info">' +
+            '<div class="s-name">' + (u.displayName || u.name) + '</div>' +
+            '<div class="s-nick">@' + u.name + '</div>' +
+          '</div>' +
+        '</div>'
+      )
+      .join('');
+    suggestionsBox.classList.remove('hidden');
+
+    suggestionsBox.querySelectorAll('.suggestion').forEach((el) => {
+      el.addEventListener('click', () => {
+        usernameInput.value = el.dataset.name;
+        hideSuggestions();
+        searchUser();
+      });
+    });
+  }, 250);
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.input-wrap')) hideSuggestions();
+});
+
 findBtn.addEventListener('click', searchUser);
 usernameInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') searchUser();
+  if (e.key === 'Enter') { hideSuggestions(); searchUser(); }
 });
+
+const changeBtn = $('#change-user');
+if (changeBtn) {
+  changeBtn.addEventListener('click', () => {
+    state.user = null;
+    userResult.classList.add('hidden');
+    usernameInput.value = '';
+    usernameInput.focus();
+    nextBtn.disabled = true;
+  });
+}
 
 // ==== Шаг 3: Kaspi + файл ====
 const copyBtn = $('#copy-req');
@@ -202,7 +301,7 @@ async function submitOrder() {
       { name: '№ Заказа', value: state.orderNumber, inline: true },
       { name: 'Способ', value: state.method, inline: true },
       { name: 'Курс', value: state.rate + ' ₸ / R$', inline: true },
-      { name: 'Roblox', value: state.user.name + (state.user.displayName ? ` (${state.user.displayName})` : ''), inline: true },
+      { name: 'Roblox', value: state.user.name + (state.user.displayName ? ' (' + state.user.displayName + ')' : ''), inline: true },
       { name: 'ID', value: String(state.user.id), inline: true },
       { name: 'Сумма', value: formatMoney(total), inline: true },
       { name: 'Робуксы', value: state.amount.toLocaleString('ru-RU') + ' R$', inline: true },
@@ -240,4 +339,3 @@ async function submitOrder() {
 
 // ==== Старт ====
 updateTotal();
-balanceEl.textContent = '31 814';
