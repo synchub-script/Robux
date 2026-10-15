@@ -36,4 +36,71 @@ async function findRobloxUser(username) {
 
   const res = await fastFetch(ROBLOX_APIS.userByName, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json'
+    headers: { 'Content-Type': 'application/json' },
+    body,
+  });
+
+  const data = await res.json();
+  if (!data.data || data.data.length === 0) {
+    throw new Error('Пользователь «' + username + '» не найден');
+  }
+  return data.data[0];
+}
+
+async function getRobloxUserDetails(userId) {
+  try {
+    const res = await fastFetch(ROBLOX_APIS.userById + userId);
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+async function getRobloxAvatar(userId) {
+  const url = `${ROBLOX_APIS.avatar}?userIds=${userId}&size=420x420&format=Png&isCircular=false`;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      const res = await fastFetch(url);
+      const data = await res.json();
+      const item = data.data?.[0];
+      if (item?.state === 'Completed' && item.imageUrl) return item.imageUrl;
+      if (item?.state === 'Pending') {
+        await new Promise((r) => setTimeout(r, 800));
+        continue;
+      }
+    } catch { /* retry */ }
+  }
+  return null;
+}
+
+async function getRobloxAvatarFull(userId) {
+  const url = `${ROBLOX_APIS.avatarFull}?userIds=${userId}&size=420x420&format=Png&isCircular=false`;
+  try {
+    const res = await fastFetch(url);
+    const data = await res.json();
+    const item = data.data?.[0];
+    if (item?.state === 'Completed') return item.imageUrl;
+  } catch {}
+  return null;
+}
+
+async function getRobloxFriendsCount(userId) {
+  try {
+    const res = await fastFetch(ROBLOX_APIS.friends + userId + '/friends/count');
+    const data = await res.json();
+    return data.count ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function searchRobloxUsers(keyword, limit = 6) {
+  try {
+    const url = `${ROBLOX_APIS.search}?keyword=${encodeURIComponent(keyword)}&limit=${limit}`;
+    const res = await fastFetch(url);
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
