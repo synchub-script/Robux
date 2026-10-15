@@ -86,7 +86,7 @@
 
       <div class="field-label mt">
         <span>Способ получения</span>
-        <a class="link" href="#">Как выбрать?</a>
+        <a class="link" href="#" onclick="return false;">Как выбрать?</a>
       </div>
 
       <div class="methods">
@@ -114,18 +114,39 @@
     <section class="step-panel hidden" data-panel="2">
       <h2>Введите ваш ник в Roblox</h2>
       <p class="muted small">Мы найдём ваш аккаунт и покажем аватар</p>
-      <div class="input-row">
-        <input type="text" id="username" placeholder="Например, Builderman">
-        <button id="find-user" class="btn-primary small">Найти</button>
+
+      <div class="input-wrap">
+        <div class="input-row">
+          <input type="text" id="username" placeholder="Например, Builderman" autocomplete="off" spellcheck="false">
+          <button id="find-user" class="btn-primary small">Найти</button>
+        </div>
+        <div id="suggestions" class="suggestions hidden"></div>
       </div>
-      <div id="user-loading" class="loader hidden"><span class="spinner"></span> Ищем аккаунт...</div>
+
+      <div id="user-loading" class="loader hidden">
+        <span class="spinner"></span> Ищем аккаунт...
+      </div>
+
       <div id="user-result" class="user-result hidden">
-        <img id="user-avatar" alt="avatar">
-        <div class="user-info">
-          <div class="user-name" id="user-name"></div>
-          <div class="user-id muted small" id="user-id"></div>
+        <div class="user-card">
+          <div class="user-card-top">
+            <div class="avatar-wrap">
+              <img id="user-avatar" alt="avatar">
+              <span class="online-dot"></span>
+            </div>
+            <div class="user-info">
+              <div class="user-name" id="user-name"></div>
+              <div class="user-tags" id="user-id"></div>
+            </div>
+          </div>
+          <div class="user-card-bottom">
+            <div class="user-meta" id="user-created"></div>
+            <p class="user-desc hidden" id="user-desc"></p>
+            <button class="change-btn" id="change-user" type="button">🔄 Сменить аккаунт</button>
+          </div>
         </div>
       </div>
+
       <div id="user-error" class="error hidden"></div>
     </section>
 
