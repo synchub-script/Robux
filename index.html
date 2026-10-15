@@ -1,66 +1,191 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#eafaff">
-  <title>RbxKZ — Robux в Казахстане</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Покупайте робуксы выгодно!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="app">
 
-<div class="announcement">
-  <span>●</span> Удобное оформление заказа · Цены в тенге
-</div>
+  <!-- Верхняя панель -->
+  <header class="topbar">
+    <nav class="topbar-tabs">
+      <span class="tab active">Моё общество</span>
+      <span class="tab">Подписки</span>
+      <span class="tab">Рекомендации</span>
+    </nav>
+    <button class="icon-btn" aria-label="Поиск">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    </button>
+  </header>
 
-<header class="site-header">
-  <a class="brand" href="#top">
-    <span class="brand-mark">R</span>
-    <span>rbx<span class="blue">kz</span><small>ROBUX STORE</small></span>
-  </a>
-
-  <nav>
-    <a href="#buy">Пополнить</a>
-    <a href="#how">Как заказать</a>
-    <a href="#profile">Мой заказ</a>
-    <a href="#faq">Вопросы</a>
-  </nav>
-
-  <a class="header-button" href="#buy">Купить Robux ↗</a>
-</header>
-
-<main id="top">
-
+  <!-- Hero -->
   <section class="hero">
-    <div class="hero-content">
-      <div class="eyebrow">✦ ТВОЙ ИГРОВОЙ МИР — БЛИЖЕ</div>
+    <h1>Покупайте<br>робуксы<br><span class="accent">выгодно!</span></h1>
+    <div class="globe">
+      <svg viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5ccbff"/>
+            <stop offset="1" stop-color="#0b8fe8"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="92" fill="url(#g1)"/>
+        <path d="M60 60 q10 -18 30 -20 t30 10 q-4 12 -20 16 t-30 0 z" fill="#ffffff" opacity=".95"/>
+        <path d="M40 100 q-6 20 6 34 t26 6 q4 -14 -4 -26 t-28 -14 z" fill="#ffffff" opacity=".95"/>
+        <path d="M110 120 q-8 20 4 40 t30 8 q0 -22 -10 -34 t-24 -14 z" fill="#ffffff" opacity=".95"/>
+        <path d="M120 40 q14 -6 26 2 t4 22 q-16 4 -28 -6 t-2 -18 z" fill="#ffffff" opacity=".95"/>
+      </svg>
+    </div>
+  </section>
 
-      <h1>
-        Покупайте<br>
-        Robux<br>
-        <span class="blue">выгодно!</span>
-      </h1>
+  <!-- Основная карточка -->
+  <main class="card">
+    <div class="steps">
+      <div class="step-dot active" data-step="1"></div>
+      <div class="step-dot" data-step="2"></div>
+      <div class="step-dot" data-step="3"></div>
+      <div class="step-dot" data-step="4"></div>
+    </div>
 
-      <p>
-        Выбери количество Robux, укажи свой Roblox username
-        и оформи заказ с оплатой через Kaspi.
-      </p>
+    <!-- ШАГ 1 -->
+    <section class="step-panel" data-panel="1">
+      <div class="panel-head">
+        <h2>Пополнить Roblox</h2>
+        <div class="balance">
+          <span class="muted">В наличии</span>
+          <span class="balance-val">31 814</span>
+          <svg class="robux-mini" viewBox="0 0 40 40"><rect x="7" y="7" width="26" height="26" rx="5" fill="#00a2ff" transform="rotate(45 20 20)"/><rect x="14" y="14" width="12" height="12" rx="2.5" fill="#e6f6ff" transform="rotate(45 20 20)"/></svg>
+        </div>
+      </div>
 
-      <a href="#buy" class="primary-button">
-        Рассчитать стоимость →
-      </a>
+      <div class="field-label">
+        <span>Ты получишь</span>
+        <span class="muted small">От 10 до 5 000 Robux</span>
+      </div>
 
-      <div class="benefits">
-        <span>✓ Понятные цены</span>
-        <span>✓ Оплата Kaspi</span>
-        <span>✓ Удобное оформление</span>
+      <div class="amount-display">
+        <svg class="robux-big" viewBox="0 0 40 40"><rect x="7" y="7" width="26" height="26" rx="5" fill="#00a2ff" transform="rotate(45 20 20)"/><rect x="14" y="14" width="12" height="12" rx="2.5" fill="#e6f6ff" transform="rotate(45 20 20)"/></svg>
+        <span id="amount-display">100</span>
+        <span class="r-symbol">R$</span>
+      </div>
+
+      <input type="range" id="amount-slider" min="10" max="5000" step="10" value="100">
+
+      <div class="quick-amounts">
+        <button class="quick active" data-amount="100">100</button>
+        <button class="quick" data-amount="500">500</button>
+        <button class="quick" data-amount="1000">1 000</button>
+        <button class="quick" data-amount="2000">2 000</button>
+      </div>
+
+      <div class="field-label mt">
+        <span>Способ получения</span>
+        <a class="link" href="#">Как выбрать?</a>
+      </div>
+
+      <div class="methods">
+        <button class="method active" data-method="Plus" data-rate="3.2">
+          <span class="method-icon">⚡</span>
+          <span class="method-name">Plus</span>
+          <span class="method-rate">3,2 ₸ / 1 R$</span>
+        </button>
+        <button class="method" data-method="GamePass" data-rate="3.5">
+          <span class="method-icon">🎮</span>
+          <span class="method-name">GamePass</span>
+          <span class="method-rate">3,5 ₸ / 1 R$</span>
+        </button>
+        <button class="method" data-method="Group" data-rate="2.8">
+          <span class="method-icon">👥</span>
+          <span class="method-name">Group</span>
+          <span class="method-rate">2,8 ₸ / 1 R$</span>
+        </button>
+      </div>
+
+      <div class="note">✓ Комиссии за передачу покрывает магазин</div>
+    </section>
+
+    <!-- ШАГ 2 -->
+    <section class="step-panel hidden" data-panel="2">
+      <h2>Введите ваш ник в Roblox</h2>
+      <p class="muted small">Мы найдём ваш аккаунт и покажем аватар</p>
+      <div class="input-row">
+        <input type="text" id="username" placeholder="Например, Builderman">
+        <button id="find-user" class="btn-primary small">Найти</button>
+      </div>
+      <div id="user-loading" class="loader hidden"><span class="spinner"></span> Ищем аккаунт...</div>
+      <div id="user-result" class="user-result hidden">
+        <img id="user-avatar" alt="avatar">
+        <div class="user-info">
+          <div class="user-name" id="user-name"></div>
+          <div class="user-id muted small" id="user-id"></div>
+        </div>
+      </div>
+      <div id="user-error" class="error hidden"></div>
+    </section>
+
+    <!-- ШАГ 3 -->
+    <section class="step-panel hidden" data-panel="3">
+      <h2>Оплата через Kaspi</h2>
+      <p class="muted small">Переведите точную сумму и прикрепите чек</p>
+
+      <div class="kaspi-card">
+        <div class="kaspi-logo">Kaspi</div>
+        <div class="kaspi-requisites">
+          <div class="req-row"><span>Номер</span><b id="kaspi-phone">4400 4300 5656 0235</b></div>
+          <div class="req-row"><span>Получатель</span><b>Аян Х.</b></div>
+          <div class="req-row"><span>Сумма</span><b id="kaspi-amount">— ₸</b></div>
+          <div class="req-row"><span>Заказ №</span><b id="order-number">—</b></div>
+        </div>
+        <button class="copy-btn" id="copy-req" type="button">📋 Скопировать номер</button>
+      </div>
+
+      <div class="field-label mt"><span>Прикрепите файл с переводом</span></div>
+      <label class="upload" for="receipt">
+        <input type="file" id="receipt" accept="image/*,.pdf" hidden>
+        <span id="upload-text">Нажмите, чтобы выбрать файл (скриншот чека)</span>
+      </label>
+    </section>
+
+    <!-- ШАГ 4 -->
+    <section class="step-panel hidden" data-panel="4">
+      <div class="success">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Заказ отправлен!</h2>
+        <p>Ваш заказ <b id="final-order"></b> принят.</p>
+        <p class="muted">С вами скоро свяжутся.</p>
+      </div>
+    </section>
+
+    <!-- Нижняя панель -->
+    <div class="bottom-bar" id="bottom-bar">
+      <div>
+        <div class="muted small">Стоимость</div>
+        <div class="total" id="total">320 ₸</div>
+      </div>
+      <div class="right">
+        <div class="muted small">На твой аккаунт</div>
+        <div class="robux-total"><span id="robux-total">100</span> Robux</div>
       </div>
     </div>
 
-    <div class="hero-art">
-      <div class="orbit orbit-one"></div>
-      <div class="orbit orbit-two"></div>
+    <div class="nav-buttons" id="nav-buttons">
+      <button class="btn-ghost" id="back-btn" disabled>Назад</button>
+      <button class="btn-primary" id="next-btn">Продолжить</button>
+    </div>
+  </main>
 
-      <div class="robux-
+  <footer class="footer">© Robux Shop — безопасная покупка робуксов</footer>
+</div>
+
+<script src="roblox.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
